@@ -53,13 +53,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         };
         
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(allowedOrigins)
+                .setAllowedOriginPatterns(allowedOrigins)
                 .setHandshakeHandler(handshakeHandler)
                 .addInterceptors(handshakeInterceptor)
                 .withSockJS();
         
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(allowedOrigins)
+                .setAllowedOriginPatterns(allowedOrigins)
                 .setHandshakeHandler(handshakeHandler)
                 .addInterceptors(handshakeInterceptor);
     }
