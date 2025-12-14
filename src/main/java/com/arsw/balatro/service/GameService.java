@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Service
 public class GameService {
@@ -18,6 +15,7 @@ public class GameService {
     
     private final Map<String, GameState> activeGames = new ConcurrentHashMap<>();
     private final Map<String, String> playerToGame = new ConcurrentHashMap<>();
+    private final Map<String, ScheduledFuture<?>> scheduledCleanups = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     
     /**
@@ -134,18 +132,40 @@ public class GameService {
         GameState state = activeGames.get(gameId);
         if (state != null) {
             state.setLastUpdate(System.currentTimeMillis());
+            // Cancelar cualquier limpieza programada cuando hay actividad
+            cancelScheduledCleanup(gameId);
         }
     }
 
     public void scheduleGameCleanup(String gameId, int secondsDelay) {
-        scheduler.schedule(() -> {
+        // Cancelar cualquier limpieza previamente programada
+        cancelScheduledCleanup(gameId);
+        
+        // Programar nueva limpieza
+        ScheduledFuture<?> future = scheduler.schedule(() -> {
             try {
+                log.info("🧹 Attempting to cleanup game {} after {} seconds of inactivity", gameId, secondsDelay);
                 cleanupGame(gameId);
-                log.info("Game {} cleaned up after player disconnection", gameId);
+                log.info("✅ Game {} cleaned up after player disconnection", gameId);
             } catch (Exception e) {
-                log.error("Error cleaning up game: {}", e.getMessage());
+                log.error("❌ Error cleaning up game {}: {}", gameId, e.getMessage());
+            } finally {
+                scheduledCleanups.remove(gameId);
             }
         }, secondsDelay, TimeUnit.SECONDS);
+        
+        scheduledCleanups.put(gameId, future);
+        log.info("⏰ Scheduled cleanup for game {} in {} seconds", gameId, secondsDelay);
+    }
+
+    public void cancelScheduledCleanup(String gameId) {
+        ScheduledFuture<?> future = scheduledCleanups.remove(gameId);
+        if (future != null && !future.isDone()) {
+            boolean cancelled = future.cancel(false);
+            if (cancelled) {
+                log.info("✅ Cancelled scheduled cleanup for game {}", gameId);
+            }
+        }
     }
 
     public void cleanupGame(String gameId) {
@@ -153,6 +173,7 @@ public class GameService {
         if (state != null) {
             playerToGame.remove(state.getPlayer1Id());
             playerToGame.remove(state.getPlayer2Id());
+            cancelScheduledCleanup(gameId);
             log.info("Game {} cleaned up", gameId);
         }
     }

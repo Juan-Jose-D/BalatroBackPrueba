@@ -163,7 +163,7 @@ public class WebRTCSignalingController {
             // Esto coincide con cómo SessionService almacena los playerIds (normalizados)
             String destination = "/queue/webrtc/" + message.getGameId();
             
-            log.info("📤 Reenviando WebRTC Signal a: {} (normalized: {}, sessionId: {}), destino: /user{}{}", 
+            log.info("📤 Reenviando WebRTC Signal a: {} (normalized: {}, sessionId: {}), destino: /user/{}{}", 
                 message.getTargetId(), 
                 normalizedTargetId,
                 targetSessionId,
