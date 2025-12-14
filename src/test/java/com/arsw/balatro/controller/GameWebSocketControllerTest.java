@@ -536,7 +536,7 @@ class GameWebSocketControllerTest {
         when(gameService.isPlayerInGame(gameId, "player1")).thenReturn(true);
 
         // When
-        GameMessage result = controller.handleGameMessage(gameId, message, principal);
+        GameMessage result = controller.handleGameMessage(gameId, message, principal, headerAccessor);
 
         // Then
         assertNotNull(result);
@@ -557,7 +557,7 @@ class GameWebSocketControllerTest {
         when(gameService.isPlayerInGame(gameId, "player1")).thenReturn(false);
 
         // When
-        GameMessage result = controller.handleGameMessage(gameId, message, principal);
+        GameMessage result = controller.handleGameMessage(gameId, message, principal, headerAccessor);
 
         // Then
         assertNotNull(result);
@@ -576,7 +576,7 @@ class GameWebSocketControllerTest {
         when(gameService.isPlayerInGame(gameId, "player1")).thenReturn(true);
 
         // When
-        controller.relayGameMessage(gameId, message, principal);
+        controller.relayGameMessage(gameId, message, principal, headerAccessor);
 
         // Then
         verify(gameService).updateGameActivity(gameId);
@@ -653,7 +653,7 @@ class GameWebSocketControllerTest {
         when(gameService.isPlayerInGame(gameId, "player1")).thenThrow(new RuntimeException("Error"));
 
         // When
-        GameMessage result = controller.handleGameMessage(gameId, message, principal);
+        GameMessage result = controller.handleGameMessage(gameId, message, principal, headerAccessor);
 
         // Then
         assertNotNull(result);
