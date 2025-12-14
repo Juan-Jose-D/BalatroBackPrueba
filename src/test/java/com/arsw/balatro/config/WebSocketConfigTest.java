@@ -66,7 +66,7 @@ class WebSocketConfigTest {
             mock(org.springframework.web.socket.config.annotation.SockJsServiceRegistration.class);
         
         when(registry.addEndpoint(anyString())).thenReturn(registration);
-        when(registration.setAllowedOrigins(any(String[].class))).thenReturn(registration);
+        when(registration.setAllowedOriginPatterns(any(String[].class))).thenReturn(registration);
         when(registration.setHandshakeHandler(any())).thenReturn(registration);
         when(registration.addInterceptors(any())).thenReturn(registration);
         when(registration.withSockJS()).thenReturn(sockJsRegistration);
@@ -76,7 +76,7 @@ class WebSocketConfigTest {
 
         // Then
         verify(registry, atLeastOnce()).addEndpoint("/ws");
-        verify(registration, atLeastOnce()).setAllowedOrigins(any(String[].class));
+        verify(registration, atLeastOnce()).setAllowedOriginPatterns(any(String[].class));
         verify(registration, atLeastOnce()).setHandshakeHandler(any());
         verify(registration, atLeastOnce()).addInterceptors(handshakeInterceptor);
     }

@@ -19,7 +19,7 @@ class CorsConfigTest {
     @BeforeEach
     void setUp() {
         corsConfig = new CorsConfig();
-        ReflectionTestUtils.setField(corsConfig, "allowedOrigins", new String[]{"http://localhost:3000", "http://localhost:8080"});
+        ReflectionTestUtils.setField(corsConfig, "allowedOriginPatterns", new String[]{"http://localhost:3000", "http://localhost:8080"});
         ReflectionTestUtils.setField(corsConfig, "allowedMethods", new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"});
         ReflectionTestUtils.setField(corsConfig, "allowedHeaders", "Content-Type,Authorization");
         ReflectionTestUtils.setField(corsConfig, "allowCredentials", true);
@@ -35,7 +35,7 @@ class CorsConfigTest {
     }
 
     @Test
-    void testCorsConfigurationSource_ShouldConfigureAllowedOrigins() {
+    void testCorsConfigurationSource_ShouldConfigureAllowedOriginPatterns() {
         // When
         CorsConfigurationSource source = corsConfig.corsConfigurationSource();
 
