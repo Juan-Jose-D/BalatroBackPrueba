@@ -23,7 +23,7 @@ public class CorsConfig {
     private String[] allowedMethods;
 
     @Value("${cors.allowed.headers:*}")
-    private String allowedHeaders;
+    private String[] allowedHeaders;
 
     @Value("${cors.allow.credentials:true}")
     private boolean allowCredentials;
@@ -31,15 +31,14 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Usar allowedOriginPatterns en lugar de allowedOrigins cuando allowCredentials=true
+
         configuration.setAllowedOriginPatterns(Arrays.asList(allowedOriginPatterns));
         configuration.setAllowedMethods(Arrays.asList(allowedMethods));
-        configuration.setAllowedHeaders(List.of(allowedHeaders));
+        configuration.setAllowedHeaders(Arrays.asList(allowedHeaders));
         configuration.setAllowCredentials(allowCredentials);
         configuration.setMaxAge(3600L);
-        
-        // Headers expuestos (importante para que el frontend pueda leer Authorization)
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+        configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
